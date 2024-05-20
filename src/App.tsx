@@ -1,11 +1,8 @@
+import React from "react";
 import "./App.css";
 import { TonConnectButton } from "@tonconnect/ui-react";
-import { Counter } from "./components/Counter";
-import { Jetton } from "./components/Jetton";
-import { TransferTon } from "./components/TransferTon";
 import { RockPaperScissors } from "./components/RockPaperScissors";
 import styled from "styled-components";
-import { Button, FlexBoxCol, FlexBoxRow } from "./components/styled/styled";
 import { useTonConnect } from "./hooks/useTonConnect";
 import { CHAIN } from "@tonconnect/protocol";
 import "@twa-dev/sdk";
@@ -19,38 +16,38 @@ const StyledApp = styled.div`
     color: white;
   }
   min-height: 100vh;
-  padding: 20px 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
-const AppContainer = styled.div`
-  max-width: 900px;
-  margin: 0 auto;
+const CenteredContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+`;
+
+const TelegramEmoji = styled.div`
+  font-size: 48px;
 `;
 
 const App: React.FC = () => {
-  const { network } = useTonConnect();
+  const { network, connected } = useTonConnect();
 
   return (
     <StyledApp>
-      <AppContainer>
-        <FlexBoxCol>
-          <FlexBoxRow>
-            <TonConnectButton />
-            <Button>
-              {network
-                ? network === CHAIN.MAINNET
-                  ? "mainnet"
-                  : "testnet"
-                : "N/A"}
-            </Button>
-          </FlexBoxRow>
-          <Counter />
-          
-          <RockPaperScissors />
-        </FlexBoxCol>
-      </AppContainer>
+      {!connected ? (
+        <CenteredContainer>
+          <TonConnectButton />
+          <TelegramEmoji>🤖</TelegramEmoji>
+        </CenteredContainer>
+      ) : (
+        <RockPaperScissors />
+      )}
     </StyledApp>
   );
-}
+};
 
 export default App;

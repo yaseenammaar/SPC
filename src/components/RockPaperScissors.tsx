@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import { Button } from "./styled/styled";
+import { useTonConnect } from "../hooks/useTonConnect";
 
 const GameContainer = styled.div`
   text-align: center;
@@ -37,16 +38,31 @@ const getResult = (playerChoice: Choice, computerChoice: Choice) => {
   return "You lose!";
 };
 
+const OWNER_ADDRESS = "UQB0fYfXeqVhnuZ9EOmXSmzJUoaGZ65Y8c5XWo4ryswanYjJ"; // Replace with the actual owner's wallet address
+const STAKE_AMOUNT = 0.001; // Amount in TON
+
 export const RockPaperScissors: React.FC = () => {
   const [playerChoice, setPlayerChoice] = useState<Choice | "">("");
   const [computerChoice, setComputerChoice] = useState<Choice | "">("");
   const [result, setResult] = useState<string>("");
+  const { sendTransaction, connected } = useTonConnect();
 
-  const handleChoice = (choice: Choice) => {
-    const randomChoice: Choice = choices[Math.floor(Math.random() * choices.length)];
-    setPlayerChoice(choice);
-    setComputerChoice(randomChoice);
-    setResult(getResult(choice, randomChoice));
+  const handleChoice = async (choice: Choice) => {
+    if (!connected) {
+      alert("Please connect your wallet first!");
+      return;
+    }
+
+    try {
+      await sendTransaction(OWNER_ADDRESS, STAKE_AMOUNT);
+      const randomChoice: Choice = choices[Math.floor(Math.random() * choices.length)];
+      setPlayerChoice(choice);
+      setComputerChoice(randomChoice);
+      setResult(getResult(choice, randomChoice));
+    } catch (error) {
+      console.error("Transaction failed", error);
+      alert("Transaction failed. Please try again.");
+    }
   };
 
   return (
